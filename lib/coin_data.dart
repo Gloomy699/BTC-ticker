@@ -41,7 +41,7 @@ class CoinData {
       if (response.statusCode == 200) {
         var decodedData = jsonDecode(response.body);
         double price = decodedData['rate'];
-        cryptoPrices[crypto] = price.toStringAsFixed(4);
+        cryptoPrices[crypto] = price.toStringAsFixed(3);
       } else {
         print(response.statusCode);
         throw 'Problem with the get request';
