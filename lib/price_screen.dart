@@ -1,3 +1,4 @@
+import 'package:bitcoin_ticker/crypto_card.dart';
 import 'package:flutter/material.dart';
 import 'coin_data.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,57 +10,57 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = 'USD';
+  String _selectedCurrency = 'USD';
 
   DropdownButton<String> androidDropdown() {
-    List<DropdownMenuItem<String>> dropdownItems = [];
+    List<DropdownMenuItem<String>> _dropdownItems = [];
     for (String currency in currenciesList) {
       var newItem = DropdownMenuItem(
         child: Text(currency),
         value: currency,
       );
-      dropdownItems.add(newItem);
+      _dropdownItems.add(newItem);
     }
 
     return DropdownButton<String>(
-      value: selectedCurrency,
-      items: dropdownItems,
+      value: _selectedCurrency,
+      items: _dropdownItems,
       onChanged: (value) {
         setState(() {
-          selectedCurrency = value;
+          _selectedCurrency = value;
         });
       },
     );
   }
 
   CupertinoPicker iOSPicker() {
-    List<Text> pickerItems = [];
+    List<Text> _pickerItems = [];
     for (String currency in currenciesList) {
-      pickerItems.add(Text(currency));
+      _pickerItems.add(Text(currency));
     }
 
     return CupertinoPicker(
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
         setState(() {
-          selectedCurrency = currenciesList[selectedIndex];
+          _selectedCurrency = currenciesList[selectedIndex];
           getData();
         });
       },
-      children: pickerItems,
+      children: _pickerItems,
     );
   }
 
-  Map<String, String> coinValues = {};
-  bool isWaiting = false;
+  Map<String, String> _coinValues = {};
+  bool _isWaiting = false;
 
   void getData() async {
-    isWaiting = true;
+    _isWaiting = true;
     try {
-      var data = await CoinData().getCoinData(selectedCurrency);
-      isWaiting = false;
+      var data = await CoinData().getCoinData(_selectedCurrency);
+      _isWaiting = false;
       setState(() {
-        coinValues = data;
+        _coinValues = data;
       });
     } catch (e) {
       print(e);
@@ -73,19 +74,19 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   Column makeCards() {
-    List<CryptoCard> cryptoCards = [];
-    for (String crypto in cryptoList) {
-      cryptoCards.add(
+    List<CryptoCard> _cryptoCards = [];
+    for (String _crypto in cryptoList) {
+      _cryptoCards.add(
         CryptoCard(
-          cryptoCurrency: crypto,
-          selectedCurrency: selectedCurrency,
-          value: isWaiting ? '?' : coinValues[crypto],
+          cryptoCurrency: _crypto,
+          selectedCurrency: _selectedCurrency,
+          value: _isWaiting ? '?' : _coinValues[_crypto],
         ),
       );
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: cryptoCards,
+      children: _cryptoCards,
     );
   }
 
@@ -108,43 +109,6 @@ class _PriceScreenState extends State<PriceScreen> {
             child: Platform.isIOS ? iOSPicker() : androidDropdown(),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class CryptoCard extends StatelessWidget {
-  const CryptoCard({
-    this.value,
-    this.selectedCurrency,
-    this.cryptoCurrency,
-  });
-
-  final String value;
-  final String selectedCurrency;
-  final String cryptoCurrency;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-      child: Card(
-        color: Colors.lightBlueAccent,
-        elevation: 5.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-          child: Text(
-            '1 $cryptoCurrency = $value $selectedCurrency',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.0,
-              color: Colors.white,
-            ),
-          ),
-        ),
       ),
     );
   }
